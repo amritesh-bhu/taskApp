@@ -77,9 +77,11 @@ const Login = () => {
                         </div>
                     </div>
 
-                    <button type="submit" className="">
-                        Log in
-                    </button>
+                    <div className="flex justify-center items-center">
+                        <button type="submit" className="text-white font-medium rounded-full bg-gradient-to-r from-indigo-500 to-indigo-900 py-3 px-12 shadow-2xl">
+                            Log in
+                        </button>
+                    </div>
 
                 </form>
             </div>
