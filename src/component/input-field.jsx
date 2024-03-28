@@ -1,0 +1,46 @@
+import { useState } from "react"
+import { useTask } from "../context/task-context"
+
+const Inputfield = () => {
+  const [task, setTask] = useState('')
+
+  const { addTask } = useTask()
+
+  const add = (e) => {
+    e.preventDefault()
+    addTask(task)
+    setTask('')
+  }
+
+  return (
+    <div className="flex justify-center items-center">
+      <form className="flex gap-4" onSubmit={add}>
+        <div className="flex items-center justify-center rounded-full shadow-2xl focus-within:ring-2 ring-1 bg-white px-2 py-3 gap-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 stroke-indigo-700">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+          </svg>
+
+          <input
+            id="task"
+            name="task"
+            className="placeholder:text-slate-500 block outline-none"
+            type="text"
+            placeholder="Create your task"
+            value={task}
+            onChange={(e) => setTask(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center justify-center rounded-full shadow-2xl">
+          <button
+            id="taskbtn"
+            name="taskbtn"
+            className="text-white font-bold rounded-full bg-gradient-to-r from-indigo-500 to-indigo-900 p-3"
+            type="submit"
+          >Add Task </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+export default Inputfield
