@@ -16,7 +16,6 @@ const Home = () => {
     const fetchTasks = async () => {
       try {
         const crtasks = await httpClient.get('/user/task')
-        console.log(crtasks)
         setTasks(crtasks.data)
       } catch (err) {
         console.error(err)
@@ -36,14 +35,30 @@ const Home = () => {
     }
   }
 
-  // const deleteTask = async (task) =>{
-  //   try{
-  //     const delitem = await httpClient.delete(`/user/task/${task._id}`)
+  const deleteTask = async (task) => {
+    try {
+      const delitem = await httpClient.delete(`/user/task/${task._id}`)
+      console.log('item', delitem.data)
+      const newtasks = tasks.filter((ele) => ele._id !== task._id)
+      setTasks(newtasks)
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
-  //   }catch(err){
-  //     console.log(err)
-  //   }
-  // }
+  const modifyTask = async (value, id) => {
+    try {
+      const updatedTask = await httpClient.put('/user/task/updatetask', { value: value, id: id })
+      console.log('updated task',updatedTask)
+      const { task } = updatedTask.data[0]
+      console.log(task)
+      const updatedtasks = tasks.map((ele) => ele._id == id ? { ...ele, task: task } : ele)
+      console.log(updatedtasks)
+      setTasks(updatedtasks)
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   const handleUserLogout = async () => {
     try {
@@ -58,7 +73,7 @@ const Home = () => {
   }
 
   return (
-    <TaskProvider value={{ tasks, addTask }}>
+    <TaskProvider value={{ tasks, addTask, deleteTask, modifyTask }}>
       <div className='w-full h-full bg-slate-100 flex flex-col gap-6'>
         <Nav handleUserLogout={handleUserLogout} />
         <Inputfield />

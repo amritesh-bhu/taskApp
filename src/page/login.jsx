@@ -30,7 +30,6 @@ const Login = () => {
     const handleLogin = async (e) => {
         try {
             e.preventDefault()
-            console.log(user)
             if (!user?.email) {
                 notifyError('Email and Password is required!')
             } else if (!user?.password) {
@@ -43,6 +42,7 @@ const Login = () => {
                 }, 2000);
             }
         } catch (err) {
+            notifyError(err.response.data.error)
             console.log(err)
         }
     }
