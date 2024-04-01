@@ -8,28 +8,44 @@ import Tasklist from '../component/task-list'
 import { useEffect } from 'react'
 
 const Home = () => {
+
   const [tasks, setTasks] = useState([])
+  const [sharedTasks, setSharedTasks] = useState([])
 
   const navigate = useNavigate()
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const crtasks = await httpClient.get('/user/task')
-        setTasks(crtasks.data)
+        const res = await httpClient.get('/user/task')
+        setTasks(res.data)
       } catch (err) {
         console.error(err)
       }
     }
     fetchTasks()
+
+    const fetchSharedTasks = async () => {
+      try {
+        const res = await httpClient.get('/rbac/tasks')
+        const ids = res.data?.map((id) => id.resourceId)
+        console.log(ids)
+        const items = await httpClient.post('/user/task/taskbyid', { ids: ids })
+        console.log(items.data)
+        setSharedTasks(items.data)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    fetchSharedTasks()
   }, [])
 
   const addTask = async (task) => {
     try {
       console.log(task)
-      const newtask = await httpClient.post('/user/task/newtask', { value: task })
-      console.log('newTask', newtask)
-      setTasks([...tasks, newtask.data])
+      const res = await httpClient.post('/user/task/newtask', { value: task })
+      console.log('newTask', res)
+      setTasks([...tasks, res.data])
     } catch (err) {
       console.log(err)
     }
@@ -37,10 +53,17 @@ const Home = () => {
 
   const deleteTask = async (task) => {
     try {
-      const delitem = await httpClient.delete(`/user/task/${task._id}`)
-      console.log('item', delitem.data)
+      const res = await httpClient.delete(`/user/task/${task._id}`)
+      console.log('item', res.data)
       const newtasks = tasks.filter((ele) => ele._id !== task._id)
+
+      const sharedres = await httpClient.delete(`/rbac/tasks/${task._id}`)
+      console.log('shared item', sharedres.data)
+      const newSharedTasks = sharedTasks.filter((ele) => ele._id !== task._id)
+      console.log(newSharedTasks)
+
       setTasks(newtasks)
+      setSharedTasks(newSharedTasks)
     } catch (err) {
       console.log(err)
     }
@@ -48,14 +71,31 @@ const Home = () => {
 
   const modifyTask = async (value, id) => {
     try {
-      const updatedTask = await httpClient.put('/user/task/updatetask', { value: value, id: id })
-      console.log('updated task',updatedTask)
-      const { task } = updatedTask.data[0]
+      const res = await httpClient.put('/user/task/updatetask', { value: value, id: id })
+      console.log('updated task', res)
+      const { task } = res.data[0]
       console.log(task)
       const updatedtasks = tasks.map((ele) => ele._id == id ? { ...ele, task: task } : ele)
       console.log(updatedtasks)
       setTasks(updatedtasks)
     } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const shareTask = async (email, resourceId, actions) => {
+    try {
+      await httpClient.post('/rbac/tasks/rolebinding', { userEmail: email, resourceId, actions: actions })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const deleteTaskByUser = async () => {
+    try{
+      //performing delete operation
+      
+    }catch(err){
       console.log(err)
     }
   }
@@ -73,7 +113,7 @@ const Home = () => {
   }
 
   return (
-    <TaskProvider value={{ tasks, addTask, deleteTask, modifyTask }}>
+    <TaskProvider value={{ tasks, sharedTasks, addTask, deleteTask, modifyTask, shareTask }}>
       <div className='w-full h-full bg-slate-100 flex flex-col gap-6'>
         <Nav handleUserLogout={handleUserLogout} />
         <Inputfield />

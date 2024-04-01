@@ -1,10 +1,13 @@
 import { useTask } from "../context/task-context"
 import { useState } from "react"
+import Edittask from "./edit-field"
+import Sharemode from "./share-field"
 
 const Usertask = () => {
-  const [edit, setEdit] = useState(false)
+  const [editMode, setEditMode] = useState(false)
   const [editTask, setEditTask] = useState('')
   const [taskId, setTaskId] = useState(-1)
+  const [shareMode, setShareMode] = useState(false)
 
   const { tasks, deleteTask, modifyTask } = useTask()
 
@@ -12,7 +15,7 @@ const Usertask = () => {
     e.preventDefault()
     modifyTask(editTask, taskId)
     setEditTask('')
-    setEdit(!edit)
+    setEditMode(!editMode)
   }
 
   return (
@@ -28,13 +31,18 @@ const Usertask = () => {
                 <div>{task.task}</div>
                 <div className="flex gap-2">
                   <svg onClick={() => {
-                    setEdit(!edit)
+                    setEditMode(!editMode)
                     setTaskId(task._id)
+                    setEditTask(task.task)
                   }}
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                   </svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <svg onClick={() => {
+                    setTaskId(task._id)
+                    setShareMode(!shareMode)
+                  }}
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
                   </svg>
                   <svg onClick={() => deleteTask(task)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -42,37 +50,24 @@ const Usertask = () => {
                   </svg>
                 </div>
                 {
-                  edit && (
-                    <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm flex justify-center items-center">
-                      <div className="bg-white rounded-lg w-80 py-2 flex flex-col gap-4 items-center">
-                        <span className="text-md font-semibold text-slate-900"> Sure, You want to rename the task ?</span>
-                        <form className="flex flex-col gap-4" onSubmit={changeTask}>
-                          <div className="flex items-center justify-center rounded-full shadow-lg focus-within:ring-2 ring-1 bg-white px-2 py-3 gap-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 stroke-indigo-700">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                            </svg>
-
-                            <input
-                              id="task"
-                              name="task"
-                              className="placeholder:text-slate-500 block outline-none"
-                              type="text"
-                              placeholder="Edit your task"
-                              value={editTask}
-                              onChange={(e) => setEditTask(e.target.value)}
-                            />
-                          </div>
-                          <div className="flex bg-white justify-center rounded-full">
-                            <button
-                              id="taskbtn"
-                              name="taskbtn"
-                              className="text-white font-bold rounded-full shadow-xl bg-gradient-to-r from-indigo-500 to-indigo-900 p-3"
-                              type="submit"
-                            >Edit Task </button>
-                          </div>
-                        </form>
-                      </div>
-                    </div>)
+                  editMode && (
+                    <Edittask
+                      changeTask={changeTask}
+                      editTask={editTask}
+                      setEditTask={setEditTask}
+                      editMode={editMode}
+                      setEditMode={setEditMode}
+                    />
+                  )
+                }
+                {
+                  shareMode && (
+                    <Sharemode
+                      taskId={taskId}
+                      shareMode={shareMode}
+                      setShareMode={setShareMode}
+                    />
+                  )
                 }
               </div>
             )
