@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState } from 'react'
 import Inputfield from '../component/input-field'
 import Nav from '../component/nav'
@@ -6,6 +7,8 @@ import { useNavigate } from 'react-router-dom'
 import { TaskProvider } from '../context/task-context'
 import Tasklist from '../component/task-list'
 import { useEffect } from 'react'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 
 const Home = () => {
 
@@ -15,6 +18,19 @@ const Home = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
+
+    const checkSession = async () => {
+      try {
+        const res = await httpClient.get('/auth/user/me')
+        if (!res) {
+          navigate('/')
+        }
+      } catch (err) {
+        navigate('/')
+      }
+    }
+    checkSession()
+
     const fetchTasks = async () => {
       try {
         const res = await httpClient.get('/user/task')
@@ -40,6 +56,14 @@ const Home = () => {
     fetchSharedTasks()
   }, [])
 
+  // const notifyError = (msg) => {
+  //   toast.error(msg, { position: 'top-center', autoClose: 2000 })
+  // }
+
+  const notifySuccess = (msg) => {
+    toast.success(msg, { position: 'bottom-left', autoClose: 2000 })
+  }
+
   const addTask = async (task) => {
     try {
       console.log(task)
@@ -60,7 +84,8 @@ const Home = () => {
       const sharedres = await httpClient.delete(`/rbac/tasks/${task._id}`)
       console.log('shared item', sharedres.data)
       const newSharedTasks = sharedTasks.filter((ele) => ele._id !== task._id)
-      console.log(newSharedTasks)
+
+      notifySuccess('deleted successfully!')
 
       setTasks(newtasks)
       setSharedTasks(newSharedTasks)
@@ -85,17 +110,22 @@ const Home = () => {
 
   const shareTask = async (email, resourceId, actions) => {
     try {
-      await httpClient.post('/rbac/tasks/rolebinding', { userEmail: email, resourceId, actions: actions })
+      const res = await httpClient.post('/rbac/tasks/rolebinding', { userEmail: email, resourceId, actions: actions })
+      console.log(res.data)
+      notifySuccess(res.data.msg)
+
     } catch (err) {
       console.log(err)
     }
   }
 
-  const deleteTaskByUser = async () => {
-    try{
-      //performing delete operation
-      
-    }catch(err){
+  const deleteTaskByUser = async (task) => {
+    try {
+      const canI = await httpClient.post('rbac/tasks', { resourceId: task._id, actions: task.action })
+      console.log(canI.data)
+
+
+    } catch (err) {
       console.log(err)
     }
   }
@@ -113,7 +143,8 @@ const Home = () => {
   }
 
   return (
-    <TaskProvider value={{ tasks, sharedTasks, addTask, deleteTask, modifyTask, shareTask }}>
+    <TaskProvider value={{ tasks, sharedTasks, addTask, deleteTask, modifyTask, shareTask, deleteTaskByUser }}>
+      <ToastContainer />
       <div className='w-full h-full bg-slate-100 flex flex-col gap-6'>
         <Nav handleUserLogout={handleUserLogout} />
         <Inputfield />

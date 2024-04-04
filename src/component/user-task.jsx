@@ -50,7 +50,7 @@ const Usertask = () => {
                   </svg>
                 </div>
                 {
-                  editMode && (
+                  editMode && task._id == taskId && (
                     <Edittask
                       changeTask={changeTask}
                       editTask={editTask}
@@ -61,7 +61,7 @@ const Usertask = () => {
                   )
                 }
                 {
-                  shareMode && (
+                  shareMode && task._id == taskId && (
                     <Sharemode
                       taskId={taskId}
                       shareMode={shareMode}

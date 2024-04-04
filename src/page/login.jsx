@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { ToastContainer, toast } from "react-toastify"
 import { httpClient } from "../lib/http-client"
 import 'react-toastify/dist/ReactToastify.css';
+import { useEffect } from "react";
 // import { AuthProvider } from "../context/auth-context";
 
 const Login = () => {
@@ -15,6 +16,23 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false)
 
     const navigate = useNavigate()
+
+
+    useEffect(()=>{
+        const checkSession = async () =>{
+            try{
+                const res = await httpClient.get('/auth/user/me')
+                if(res){
+                    navigate('/tasks')
+                }
+            }catch(err){
+                console.log(err,'Please login!')
+            }
+        }
+        checkSession()
+    },[])
+
+
 
     const handleShowPassword = () => {
         setShowPassword(!showPassword)
