@@ -80,15 +80,17 @@ const Home = () => {
       const res = await httpClient.delete(`/user/task/${task._id}`)
       console.log('item', res.data)
       const newtasks = tasks.filter((ele) => ele._id !== task._id)
+      setTasks(newtasks)
 
       const sharedres = await httpClient.delete(`/rbac/tasks/${task._id}`)
-      console.log('shared item', sharedres.data)
-      const newSharedTasks = sharedTasks.filter((ele) => ele._id !== task._id)
+      if (!sharedres) {
+        const newSharedTasks = sharedTasks.filter((ele) => ele._id !== task._id)
 
-      notifySuccess('deleted successfully!')
+        notifySuccess('deleted successfully!')
 
-      setTasks(newtasks)
-      setSharedTasks(newSharedTasks)
+        setSharedTasks(newSharedTasks)
+     }
+
     } catch (err) {
       console.log(err)
     }
