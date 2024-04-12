@@ -69,7 +69,7 @@ const Home = () => {
       console.log(task)
       const res = await httpClient.post('/user/task/newtask', { value: task })
       console.log('newTask', res)
-      setTasks([...tasks, res.data])
+      setTasks([res.data, ...tasks])
     } catch (err) {
       console.log(err)
     }
@@ -77,19 +77,21 @@ const Home = () => {
 
   const deleteTask = async (task) => {
     try {
+      console.log('user', task)
       const res = await httpClient.delete(`/user/task/${task._id}`)
       console.log('item', res.data)
       const newtasks = tasks.filter((ele) => ele._id !== task._id)
       setTasks(newtasks)
 
       const sharedres = await httpClient.delete(`/rbac/tasks/${task._id}`)
-      if (!sharedres) {
+      console.log('hey', sharedres)
+      if (sharedres.data) {
         const newSharedTasks = sharedTasks.filter((ele) => ele._id !== task._id)
 
         notifySuccess('deleted successfully!')
 
         setSharedTasks(newSharedTasks)
-     }
+      }
 
     } catch (err) {
       console.log(err)
@@ -105,6 +107,7 @@ const Home = () => {
       const updatedtasks = tasks.map((ele) => ele._id == id ? { ...ele, task: task } : ele)
       console.log(updatedtasks)
       setTasks(updatedtasks)
+
     } catch (err) {
       console.log(err)
     }
@@ -121,16 +124,16 @@ const Home = () => {
     }
   }
 
-  const deleteTaskByUser = async (task) => {
-    try {
-      const canI = await httpClient.post('rbac/tasks', { resourceId: task._id, actions: task.action })
-      console.log(canI.data)
+  // const deleteTaskByUser = async (task) => {
+  //   try {
+  //     const canI = await httpClient.post('rbac/tasks', { resourceId: task._id, actions: task.action })
+  //     console.log(canI.data)
 
 
-    } catch (err) {
-      console.log(err)
-    }
-  }
+  //   } catch (err) {
+  //     console.log(err)
+  //   }
+  // }
 
   const handleUserLogout = async () => {
     try {
@@ -145,7 +148,7 @@ const Home = () => {
   }
 
   return (
-    <TaskProvider value={{ tasks, sharedTasks, addTask, deleteTask, modifyTask, shareTask, deleteTaskByUser }}>
+    <TaskProvider value={{ tasks, sharedTasks, addTask, deleteTask, modifyTask, shareTask, setSharedTasks }}>
       <ToastContainer />
       <div className='w-full h-full bg-slate-100 flex flex-col gap-6'>
         <Nav handleUserLogout={handleUserLogout} />

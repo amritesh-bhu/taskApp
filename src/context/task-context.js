@@ -6,7 +6,8 @@ export const TaskContext = createContext({
     addTask: () => { },
     deleteTask: () => { },
     modifyTask: () => { },
-    shareTask: () => { }
+    shareTask: () => { },
+    setSharedTasks: () => { }
 })
 
 export const useTask = () => {
