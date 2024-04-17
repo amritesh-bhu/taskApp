@@ -10,8 +10,10 @@ const Sharedtask = () => {
   const [taskId, setTaskId] = useState(-1)
   const [editTask, setEditTask] = useState('')
   const [action, setAction] = useState('')
+  const [reqActions, setReqActions] = useState([])
 
   const { sharedTasks, setSharedTasks, deleteTask, modifyTask } = useTask()
+
 
   const editTaskByUser = async (e) => {
     e.preventDefault()
@@ -38,6 +40,20 @@ const Sharedtask = () => {
       }
     } catch (err) {
       console.log(err)
+    }
+  }
+
+  const handleRequests = async (e, task) => {
+    try {
+      e.preventDefault()
+      console.log("task", task)
+      console.log("actions", reqActions)
+      const resReq = await httpClient.post('/action/requests', { resourceId: task._id, userId: task.userId, action: reqActions })
+      console.log("resReq", resReq.data)
+      setToggleMenu(!toggleMenu)
+
+    } catch (err) {
+      console.error("error from handle requests", err)
     }
   }
 
@@ -88,18 +104,30 @@ const Sharedtask = () => {
                           <div>
                             <span className="font-semibold ">Request for action</span>
                           </div>
-                          <div className="flex justify-center gap-2">
-                            <div className="bg-white flex gap-2 px-2 shadow-2xl rounded-2xl">
-                              <input type="checkbox" />
-                              <label>Edit</label>
-                            </div>
-                            <div className="bg-white flex gap-2 px-2 shadow-2xl rounded-2xl">
-                              <input type="checkbox" />
-                              <label>Delete</label>
-                            </div>
-                          </div>
-                          <div className="shadow-2xl rounded-2xl px-2 flex justify-center items-center">
-                            <button className="text-white text-sm font-semibold bg-gradient-to-r from-indigo-500 to-indigo-900 shadow-2xl rounded-2xl p-2">Delete</button>
+                          <div className="flex flex-col justify-center items-center gap-4">
+                            <form onSubmit={(e) => handleRequests(e, task)} className="gap-4">
+                              <div className="flex justify-center gap-2">
+                                <div className="bg-white flex gap-2 px-2 shadow-2xl rounded-2xl">
+                                  <input
+                                    type="checkbox"
+                                    value="edit"
+                                    onChange={(e) => setReqActions([...reqActions, e.target.value])}
+                                  />
+                                  <label>Edit</label>
+                                </div>
+                                <div className="bg-white flex gap-2 px-2 shadow-2xl rounded-2xl">
+                                  <input
+                                    type="checkbox"
+                                    value='delete'
+                                    onChange={(e) => setReqActions([...reqActions, e.target.value])}
+                                  />
+                                  <label>Delete</label>
+                                </div>
+                              </div>
+                              <div className="shadow-2xl rounded-2xl px-2 flex justify-center items-center">
+                                <button className="text-white text-sm font-semibold bg-gradient-to-r from-indigo-500 to-indigo-900 shadow-2xl rounded-2xl p-2">Send</button>
+                              </div>
+                            </form>
                           </div>
                         </div>
                       </div>

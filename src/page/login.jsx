@@ -22,6 +22,7 @@ const Login = () => {
         const checkSession = async () =>{
             try{
                 const res = await httpClient.get('/auth/user/me')
+                console.log('login',res.data)
                 if(res){
                     navigate('/tasks')
                 }

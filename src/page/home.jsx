@@ -14,6 +14,7 @@ const Home = () => {
 
   const [tasks, setTasks] = useState([])
   const [sharedTasks, setSharedTasks] = useState([])
+  const [actionReq, setActionReq] = useState([])
 
   const navigate = useNavigate()
 
@@ -45,7 +46,6 @@ const Home = () => {
       try {
         const res = await httpClient.get('/rbac/tasks')
         const ids = res.data?.map((id) => id.resourceId)
-        console.log(ids)
         const items = await httpClient.post('/user/task/taskbyid', { ids: ids })
         console.log(items.data)
         setSharedTasks(items.data)
@@ -54,6 +54,18 @@ const Home = () => {
       }
     }
     fetchSharedTasks()
+
+    const resourceReqByUser = async () => {
+      try {
+        const userReqs = await httpClient.get('/action/requests/listrqsts')
+        console.log('user req', userReqs.data)
+        setActionReq(userReqs.data)
+      } catch (err) {
+        console.log(err)
+      }
+    }
+
+    resourceReqByUser()
   }, [])
 
   // const notifyError = (msg) => {
@@ -148,7 +160,7 @@ const Home = () => {
   }
 
   return (
-    <TaskProvider value={{ tasks, sharedTasks, addTask, deleteTask, modifyTask, shareTask, setSharedTasks }}>
+    <TaskProvider value={{ tasks, sharedTasks, actionReq, addTask, deleteTask, modifyTask, shareTask, setSharedTasks }}>
       <ToastContainer />
       <div className='w-full h-full bg-slate-100 flex flex-col gap-6'>
         <Nav handleUserLogout={handleUserLogout} />
