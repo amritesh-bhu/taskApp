@@ -3,12 +3,13 @@ import { useContext, createContext } from "react";
 export const TaskContext = createContext({
     tasks: [],
     sharedTasks: [],
-    actionReq : [],
+    actionReq: [],
     addTask: () => { },
     deleteTask: () => { },
     modifyTask: () => { },
     shareTask: () => { },
-    setSharedTasks: () => { }
+    setSharedTasks: () => { },
+    setActionReq: () => { }
 })
 
 export const useTask = () => {

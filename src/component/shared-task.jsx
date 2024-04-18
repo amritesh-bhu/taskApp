@@ -10,7 +10,7 @@ const Sharedtask = () => {
   const [taskId, setTaskId] = useState(-1)
   const [editTask, setEditTask] = useState('')
   const [action, setAction] = useState('')
-  const [reqActions, setReqActions] = useState([])
+  const [reqActions, setReqActions] = useState('')
 
   const { sharedTasks, setSharedTasks, deleteTask, modifyTask } = useTask()
 
@@ -109,17 +109,18 @@ const Sharedtask = () => {
                               <div className="flex justify-center gap-2">
                                 <div className="bg-white flex gap-2 px-2 shadow-2xl rounded-2xl">
                                   <input
-                                    type="checkbox"
-                                    value="edit"
-                                    onChange={(e) => setReqActions([...reqActions, e.target.value])}
+                                    type="radio"
+                                    value={reqActions}
+                                    checked = {reqActions == 'edit'}
+                                    onChange={(e) => setReqActions('edit')}
                                   />
                                   <label>Edit</label>
                                 </div>
                                 <div className="bg-white flex gap-2 px-2 shadow-2xl rounded-2xl">
                                   <input
-                                    type="checkbox"
-                                    value='delete'
-                                    onChange={(e) => setReqActions([...reqActions, e.target.value])}
+                                    type="radio"
+                                    value={reqActions == 'delete'}
+                                    onChange={(e) => setReqActions('delete')}
                                   />
                                   <label>Delete</label>
                                 </div>

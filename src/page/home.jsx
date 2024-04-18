@@ -160,7 +160,7 @@ const Home = () => {
   }
 
   return (
-    <TaskProvider value={{ tasks, sharedTasks, actionReq, addTask, deleteTask, modifyTask, shareTask, setSharedTasks }}>
+    <TaskProvider value={{ tasks, sharedTasks, actionReq, addTask, deleteTask, modifyTask, shareTask, setSharedTasks, setActionReq }}>
       <ToastContainer />
       <div className='w-full h-full bg-slate-100 flex flex-col gap-6'>
         <Nav handleUserLogout={handleUserLogout} />
