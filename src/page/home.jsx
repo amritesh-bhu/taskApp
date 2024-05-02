@@ -11,38 +11,57 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 
 const Home = () => {
-
   const [tasks, setTasks] = useState([])
   const [sharedTasks, setSharedTasks] = useState([])
   const [actionReq, setActionReq] = useState([])
 
   const navigate = useNavigate()
 
+  const [ws, setWs] = useState(null)
+
   useEffect(() => {
+    const socket = new WebSocket('ws://localhost:5005')
 
-    const checkSession = async () => {
-      try {
-        const res = await httpClient.get('/auth/user/me')
-        if (!res) {
-          navigate('/')
-        }
-      } catch (err) {
-        navigate('/')
-      }
+    socket.onopen = () => {
+      console.log('connected')
+      socket.send("hi there")
+      setWs(socket)
+
     }
-    checkSession()
 
-    const fetchTasks = async () => {
+    socket.onmessage = (msg) => {
+      console.log("msg from server : ", msg.data)
+    }
+
+    socket.onclose = () => {
+      console.log('disconnected')
+    }
+
+    return () => {
+      if (socket) {
+        console.log("closing")
+        socket.close()
+      }
+      setWs(null)
+    }
+  }, [])
+
+  useEffect(() => {
+    (async () => {
       try {
         const res = await httpClient.get('/user/task')
         setTasks(res.data)
+        ws.onmessage = (msg) => {
+          console.log('message',msg)
+        }
       } catch (err) {
         console.error(err)
       }
-    }
-    fetchTasks()
+    })()
+  }, [])
 
-    const fetchSharedTasks = async () => {
+  useEffect(() => {
+    (async () => {
       try {
         const res = await httpClient.get('/rbac/tasks')
         const ids = res.data?.map((id) => id.resourceId)
@@ -52,10 +71,11 @@ const Home = () => {
       } catch (err) {
         console.error(err)
       }
-    }
-    fetchSharedTasks()
+    })()
+  }, [])
 
-    const resourceReqByUser = async () => {
+  useEffect(() => {
+    (async () => {
       try {
         const userReqs = await httpClient.get('/action/requests/listrqsts')
         console.log('user req', userReqs.data)
@@ -63,14 +83,19 @@ const Home = () => {
       } catch (err) {
         console.log(err)
       }
-    }
-
-    resourceReqByUser()
+    })()
   }, [])
 
-  // const notifyError = (msg) => {
-  //   toast.error(msg, { position: 'top-center', autoClose: 2000 })
-  // }
+
+  const notifyError = (msg) => {
+    toast.error(msg, { position: 'top-center', autoClose: 2000 })
+  }
+
+  // useEffect(() => {
+  //   if (ws) {
+  //     ws.send("hi from client")
+  //   }
+  // }, [ws])
 
   const notifySuccess = (msg) => {
     toast.success(msg, { position: 'bottom-left', autoClose: 2000 })
