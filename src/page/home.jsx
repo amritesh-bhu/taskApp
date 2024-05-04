@@ -20,6 +20,22 @@ const Home = () => {
   const [ws, setWs] = useState(null)
 
   useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await httpClient.get('/auth/user/me')
+        console.log('login', res.data)
+        if (res) {
+          navigate('/tasks')
+        }
+      } catch (err) {
+        navigate('/')
+        console.log(err, 'Please login!')
+      }
+    }
+    checkSession()
+  }, [])
+
+  useEffect(() => {
     const socket = new WebSocket('ws://localhost:5005')
 
     socket.onopen = () => {
@@ -30,12 +46,22 @@ const Home = () => {
     }
 
     socket.onmessage = (msg) => {
-      console.log("msg from server : ", msg.data)
+      const pmsg = JSON.parse(msg.data)
+      switch (pmsg.type) {
+        case 'new task':
+          notifyInfo('New Task added !')
+          console.log(tasks)
+          setTasks((prev) => [pmsg.item, ...prev])
+          break
+        default :
+          notifyInfo(msg.data)
+          break
+      }
     }
 
-    socket.onclose = () => {
-      console.log('disconnected')
-    }
+    // socket.onclose = () => {
+    //   console.log('disconnected')
+    // }
 
     return () => {
       if (socket) {
@@ -51,9 +77,6 @@ const Home = () => {
       try {
         const res = await httpClient.get('/user/task')
         setTasks(res.data)
-        ws.onmessage = (msg) => {
-          console.log('message',msg)
-        }
       } catch (err) {
         console.error(err)
       }
@@ -66,7 +89,6 @@ const Home = () => {
         const res = await httpClient.get('/rbac/tasks')
         const ids = res.data?.map((id) => id.resourceId)
         const items = await httpClient.post('/user/task/taskbyid', { ids: ids })
-        console.log(items.data)
         setSharedTasks(items.data)
       } catch (err) {
         console.error(err)
@@ -86,6 +108,10 @@ const Home = () => {
     })()
   }, [])
 
+
+  const notifyInfo = (msg) => {
+    toast.info(msg, { position: 'top-center', autoClose: 2000 })
+  }
 
   const notifyError = (msg) => {
     toast.error(msg, { position: 'top-center', autoClose: 2000 })
@@ -153,9 +179,11 @@ const Home = () => {
   const shareTask = async (email, resourceId, actions) => {
     try {
       const res = await httpClient.post('/rbac/tasks/rolebinding', { userEmail: email, resourceId, actions: actions })
-      console.log(res.data)
+      console.log(res.data.resourceId)
       notifySuccess(res.data.msg)
 
+      const newSharedTask = await httpClient.post('/user/task/taskbyid', { ids: [res.resourceId], userEmail: res.userEmail })
+      console.log(newSharedTask)
     } catch (err) {
       console.log(err)
     }
@@ -176,6 +204,9 @@ const Home = () => {
     try {
       const userSession = await httpClient.delete('/auth/user/logout')
       console.log(userSession)
+      ws.onclose = () => {
+        console.log('disconnected')
+      }
       setTimeout(() => {
         navigate('/')
       }, 2000);
