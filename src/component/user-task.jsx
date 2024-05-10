@@ -23,7 +23,7 @@ const Usertask = () => {
       <div className="flex items-center bg-white shadow-2xl rounded-2xl py-3 px-3">
         <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-indigo-900">Task created by you</span>
       </div>
-      <div className="flex flex-col gap-4 px-2">
+      <div className="h-full flex flex-col gap-4 px-2">
         {
           tasks.length ? (tasks.map((task) => {
             return (

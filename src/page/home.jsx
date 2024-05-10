@@ -204,6 +204,7 @@ const Home = () => {
     try {
       const userSession = await httpClient.delete('/auth/user/logout')
       console.log(userSession)
+      notifySuccess('Succefully logged out!')
       ws.onclose = () => {
         console.log('disconnected')
       }

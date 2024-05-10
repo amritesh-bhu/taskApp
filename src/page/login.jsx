@@ -67,7 +67,7 @@ const Login = () => {
 
     return (
         // <AuthProvider value={{showPassword,handleShowPassword,notifyError,notifySuccess}}>
-        <div className="w-2/3 h-2/3 flex justify-center items-center shadow-2xl rounded-md">
+        <div className="w-2/3 h-2/3 flex justify-center items-center shadow-2xl rounded-md sm:w-2/3 h-2/3">
             <ToastContainer />
             <div className="w-full h-full bg-gradient-to-r from-indigo-500 to-indigo-900 rounded-l-lg flex flex-col  justify-center">
 
